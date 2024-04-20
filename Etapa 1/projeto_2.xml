@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+const int N = 4; // número de semáforos
+typedef int[0,N-1] id_t;
+
+clock g_time = 0;
+
+typedef struct {
+    int red;
+    int green;
+    int yellow;
+} delay_t;
+
+chan start[N];
+chan a, b;</declaration>
+	<template>
+		<name>controle</name>
+		<declaration>clock t;</declaration>
+		<location id="id0" x="-1054" y="-374">
+			<name x="-1079" y="-408">Startup</name>
+		</location>
+		<location id="id1" x="-875" y="-374">
+		</location>
+		<location id="id2" x="-697" y="-374">
+		</location>
+		<location id="id3" x="-867" y="-263">
+		</location>
+		<init ref="id0"/>
+		<transition id="id4">
+			<source ref="id3"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-1028" y="-306">start[3]!</label>
+		</transition>
+		<transition id="id5">
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-773" y="-314">start[2]!</label>
+		</transition>
+		<transition id="id6">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-807" y="-416">t &gt; 8</label>
+			<label kind="synchronisation" x="-824" y="-399">start[1] !</label>
+		</transition>
+		<transition id="id7">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-1003" y="-400">start[0] !</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">semaforo</name>
+		<parameter>const id_t id, const delay_t delay, const int t0</parameter>
+		<declaration>// Place local declarations here.
+clock t = 0;</declaration>
+		<location id="id8" x="-484" y="-119">
+			<name x="-510" y="-153">Startup</name>
+		</location>
+		<location id="id9" x="-85" y="-221">
+			<name x="-102" y="-255">GREEN</name>
+		</location>
+		<location id="id10" x="-85" y="-119">
+			<name x="-111" y="-102">YELLOW</name>
+		</location>
+		<location id="id11" x="-323" y="-119">
+			<name x="-331" y="-102">RED</name>
+		</location>
+		<init ref="id8"/>
+		<transition id="id12">
+			<source ref="id8"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-425" y="-119">t &gt; t0</label>
+			<label kind="synchronisation" x="-442" y="-144">start[id]?</label>
+			<label kind="assignment" x="-425" y="-102">t = 0</label>
+		</transition>
+		<transition id="id13">
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-280" y="-110">t &gt;= delay.yellow</label>
+			<label kind="assignment" x="-280" y="-93">t = 0</label>
+		</transition>
+		<transition id="id14">
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-76" y="-195">t &gt;=delay.green</label>
+			<label kind="assignment" x="-76" y="-178">t = 0</label>
+		</transition>
+		<transition id="id15">
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-289" y="-263">t &gt;= delay.red</label>
+			<label kind="assignment" x="-289" y="-246">t = 0</label>
+			<nail x="-323" y="-221"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+
+const delay_t delay = {10, 20, 2};
+
+s1 = semaforo(0, delay, 0);
+s2 = semaforo(1, delay, 8);
+s3 = semaforo(2, delay, 16);
+s4 = semaforo(3, delay, 24);
+
+// List one or more processes to be composed into a system.
+system s1, s2, s3, s4, controle;
+</system>
+	<queries>
+		<query>
+			<formula/>
+			<comment/>
+		</query>
+	</queries>
+</nta>
