@@ -1,59 +1,60 @@
+# ONDA VERDE
+
+Este projeto tem como objetivo modelar, utilizando a ferramenta UPPAAL, um sistema de semáforos que permita a um motorista percorrer um trajeto de forma otimizada, passando por no máximo um semáforo vermelho.
+
+## Etapa 1: Modelagem dos Autômatos Temporizados
+
+Nesta etapa inicial do projeto, serão criados os modelos de autômatos temporizados que definem o comportamento dos 4 semáforos e do motorista. Abaixo estão os dados relevantes para a modelagem:
+
+- **Distância do posto ao 1º semáforo:** 1.200m
+- **Distância do 1º ao 2º semáforo:** 130m
+- **Distância do 2º ao 3º semáforo:** 160m
+- **Distância do 3º ao 4º semáforo:** 170m
+- **Distância do 4º semáforo ao Rota:** 90m
+- **Distância total:** 1.750m
+- **Velocidade média de deslocamento:** 40 km/h
+
+Para garantir que o motorista chegue ao destino parando em no máximo um semáforo, será necessário sincronizar os semáforos de forma inteligente, considerando as distâncias entre eles e a velocidade média de deslocamento.
+
 ## Verificação
 
-A verificação é uma ferramenta do UPPAAL que permite verificar se certas propriedades do sistema (*Reachability, Safety and Liveness*) pela exploração *on-the-fly* do sistema em espaço de estados.
+A verificação é uma ferramenta essencial do UPPAAL, permitindo verificar se certas propriedades do sistema (*Reachability, Safety and Liveness*) são mantidas pela exploração *on-the-fly* do sistema em seu espaço de estados.
 
-Esta ferramenta pode ser encontrado no menu de opções do UPPAAL na aba chamada verifier. Neste menu é possível escrever as queries (os requisitos do sistema), com o propósito de verificar se o modelo responde as especificações do projeto. O programa utiliza uma versão simplificada do Timed Computation Tree Logic (TCTL).
+Para utilizar essa ferramenta, basta acessar o menu de opções do UPPAAL e selecionar a aba chamada "Verifier". Nesse menu, é possível escrever as queries (requisitos do sistema) para verificar se o modelo atende às especificações do projeto. O UPPAAL utiliza uma versão simplificada do Timed Computation Tree Logic (TCTL) para essa finalidade.
 
-### A Linguagem de busca (The Query Language)
+### A Linguagem de Busca (The Query Language)
 
-A linguagem de busca consiste de *State formulae* e *Path formulae* (propriedade de estado e propriedade de caminho). Esta linguagem é expressa formalmente e é bem definida, como também é uma linguagem de máquina legível.
+A linguagem de busca consiste em *State formulae* e *Path formulae* (propriedades de estado e de caminho). Essa linguagem é formalmente expressa e bem definida, sendo legível tanto por humanos quanto por máquinas.
 
+**State Formulae**:
+Uma State formula é uma expressão que pode ser avaliada para um estado sem considerar o comportamento do modelo. Por exemplo, pode ser uma expressão simples como `i == 7`, que é verdadeira em qualquer estado onde `i` seja igual a 7. Também é possível testar se um processo P está em uma localização I usando a expressão na forma `P.I`.
 
-**State Formulae** A State formula: é uma expressão que pode ser avaliada para um estado sem olhar para o comportamento do modelo. Por exemplo, pode ser uma expressão simples como `i == 7`, que é verdade em um estado qualquer onde `i` é iguala  7. Também é possível testar se um processo P está em uma localização I usando a expressão na forma `P.I`.
+**Path Formulae**:
+Quantifica em um caminho ou *trace* de um modelo e é classificado como alcançável, seguro ou de liveness.
 
-
-**Path formulae**: Quantifica em um caminho ou no *trace* de um modelo. É classificado como:
-* Alcançável
-* Seguro
-* Liveness
-
-**Estados**: São definidos como um tupla (L, v), onde L é um vetor de localização e v é a função de avaliação que mapeia uma variável inteira e *clocks* para seus respectivos valores.
-
-**Propriedade de estado ou formula de estado**: Any side-effect free expression is a valid state property. É possível testar se um processo está em uma localização particular e se um estado é *deadlock*. Propriedades de estado são avaliadas para o estado inicial e para qualquer transição.
-
-Exemplo:
-```
-E<> p1.cs and p2.cs
-```
-
-Propriedades de estado na localização:
-. Expressões na forma P.l, onde P é um processo e l é uma localização, avalia para verdade em um estado (L, v) se e somente se P.l está em L.
-
-Propriedade de Deadlock:
-. O estado de propriedade *deadlock* é avaliada como verdadeiro para um estado (L, V) se e somente se para todo $d \get 0$ não existir nenhuma ação sucessora de (L, v + d). Em outras palavras, não existir nenhum estado (local) posterior a localização atual.
+**Estados**:
+São definidos como uma tupla (L, v), onde L é um vetor de localização e v é a função de avaliação que mapeia uma variável inteira e *clocks* para seus respectivos valores.
 
 **Tipos de Queries**:
-. Propriedades de alcançabilidade: Uma condição específica mantém-se num determinado estado(alguns) dos comportamentos potenciais dos modelos.
-. Propriedades de segurança: Uma condição específica mantém-se em todos os estados de um caminho de execução.
-. Propriedades de liveness: é garantido que uma determinada condição se verificará eventualmente( = num determinado momento).
-. Propriedades de `deadlock`: Um `deadlock` é possível ou não no modelo.
+- Propriedades de alcançabilidade: Verifica se uma condição específica é mantida em um determinado estado ou em alguns comportamentos potenciais do modelo.
+- Propriedades de segurança: Garante que uma condição específica é mantida em todos os estados de um caminho de execução.
+- Propriedades de liveness: Garante que uma determinada condição será eventualmente verificada em algum momento.
+- Propriedades de deadlock: Verifica se um deadlock é possível ou não no modelo.
 
 **Tipos no UPPAAL**:
-. E - existe um caminho
-. A - para todos caminhos
-. [] - todos os estados em um caminho
-. <> - algum estado em um caminho
+- E - Existe um caminho
+- A - Para todos os caminhos
+- [] - Todos os estados em um caminho
+- <> - Algum estado em um caminho
 
-Algumas combinações também são suportadas:
-```
+Algumas combinações também são suportadas, como:
 A[] <expressão>
 E<> <expressão>
 E[] <expressão>
 A<> <expressão>
 <expressão> --> <expressão>
-```
 
-**Verificação de alcançabilidade**
-Verifica se alguma estado é alcançável partindo do estado inicial.
-. `E<> p`: é possível alcançar um estado em que p é satisfeito.
-. p é verdadeiro se pelo menos um estado é alcançável.
+**Verificação de Alcançabilidade**:
+Verifica se algum estado é alcançável a partir do estado inicial.
+- `E<> p`: É possível alcançar um estado onde p é satisfeito.
+- p é verdadeira se pelo menos um estado é alcançável.
