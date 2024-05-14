@@ -7,45 +7,54 @@ const int N = 4;         // número de semáforos
 int cont = 0;            // contador de paradas
 typedef int[0,N-1] id_t;
 
-clock g_time = 0;
+clock g_time = 0;        // tempo global
 
 typedef struct {
     int red;
     int green;
     int yellow;
-    int t8s;
 } delay_t;
 
 chan start[N];
 chan a, b;
+
+chan scl;
 
 chan green8S[N];
 chan ss_red[N];
 
 bool isOpen[N];
 bool neverHappen;
-chan ss_green[N];
 
-chan tick;</declaration>
+
+chan semOpen[N];
+chan semClose[N];
+chan semWarn[N];
+
+broadcast chan tick;</declaration>
 	<template>
 		<name>Trajeto</name>
 		<parameter>const int t1, const int t2, const int t3, const int t4, const int t5</parameter>
 		<declaration>clock et_time; // tempo de viagem efetivo
 clock tt_time; // tempo total desde o inicio do trajeto</declaration>
-		<location id="id0" x="-1045" y="-340">
-			<name x="-1113" y="-374">Posto</name>
+		<location id="id0" x="-1156" y="-340">
+			<name x="-1224" y="-374">Posto</name>
 		</location>
 		<location id="id1" x="-705" y="-340">
 			<name x="-715" y="-374">T1</name>
+			<urgent/>
 		</location>
 		<location id="id2" x="-323" y="-340">
 			<name x="-333" y="-374">T2</name>
+			<urgent/>
 		</location>
 		<location id="id3" x="-323" y="-85">
 			<name x="-306" y="-94">T3</name>
+			<urgent/>
 		</location>
 		<location id="id4" x="-740" y="-85">
 			<name x="-750" y="-119">T4</name>
+			<urgent/>
 		</location>
 		<location id="id5" x="-901" y="-85">
 			<name x="-911" y="-119">d4_g</name>
@@ -74,122 +83,139 @@ clock tt_time; // tempo total desde o inicio do trajeto</declaration>
 		<location id="id13" x="-816" y="25">
 			<name x="-841" y="42">WaitT4</name>
 		</location>
-		<location id="id14" x="-1037" y="-85">
-			<name x="-1047" y="-119">Casa</name>
+		<location id="id14" x="-1020" y="-85">
+			<name x="-1045" y="-119">intermediario</name>
+			<urgent/>
+		</location>
+		<location id="id15" x="-1156" y="-25">
+			<name x="-1166" y="-59">Casa</name>
+		</location>
+		<location id="id16" x="-1156" y="-144">
+			<name x="-1166" y="-178">AngryKyller</name>
 		</location>
 		<init ref="id0"/>
-		<transition id="id15">
+		<transition id="id17">
+			<source ref="id14"/>
+			<target ref="id16"/>
+			<label kind="guard" x="-1096" y="-144">cont &gt; 1</label>
+		</transition>
+		<transition id="id18">
+			<source ref="id14"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-1146" y="-93">cont &lt;=1</label>
+		</transition>
+		<transition id="id19">
 			<source ref="id5"/>
 			<target ref="id14"/>
-			<label kind="guard" x="-1011" y="-144">et_time &lt;= t5</label>
+			<label kind="guard" x="-1173" y="8">et_time &gt;= t5</label>
 		</transition>
-		<transition id="id16">
+		<transition id="id20">
 			<source ref="id13"/>
 			<target ref="id5"/>
 			<label kind="guard" x="-969" y="-34">isOpen[3]</label>
 			<label kind="synchronisation" x="-969" y="-17">green8S[3] ?</label>
 			<label kind="assignment" x="-969" y="0">et_time = 0</label>
 		</transition>
-		<transition id="id17">
+		<transition id="id21">
 			<source ref="id4"/>
 			<target ref="id13"/>
 			<label kind="guard" x="-739" y="-51">!isOpen[3]</label>
 			<label kind="assignment" x="-731" y="-34">cont++</label>
 		</transition>
-		<transition id="id18">
+		<transition id="id22">
 			<source ref="id12"/>
 			<target ref="id9"/>
 			<label kind="guard" x="-561" y="-51">isOpen[2]</label>
 			<label kind="synchronisation" x="-561" y="-34">green8S[2] ?</label>
 			<label kind="assignment" x="-561" y="-17">et_time = 0</label>
 		</transition>
-		<transition id="id19">
+		<transition id="id23">
 			<source ref="id3"/>
 			<target ref="id12"/>
 			<label kind="guard" x="-348" y="-51">!isOpen[2]</label>
 			<label kind="assignment" x="-348" y="-34">cont++</label>
 		</transition>
-		<transition id="id20">
+		<transition id="id24">
 			<source ref="id11"/>
 			<target ref="id8"/>
 			<label kind="guard" x="-255" y="-255">isOpen[1]</label>
 			<label kind="synchronisation" x="-255" y="-238">green8S[1] ?</label>
 			<label kind="assignment" x="-255" y="-221">et_time=0</label>
 		</transition>
-		<transition id="id21">
+		<transition id="id25">
 			<source ref="id2"/>
 			<target ref="id11"/>
 			<label kind="guard" x="-272" y="-357">!isOpen[1]</label>
 			<label kind="assignment" x="-272" y="-340">cont++</label>
 		</transition>
-		<transition id="id22">
+		<transition id="id26">
 			<source ref="id10"/>
 			<target ref="id7"/>
 			<label kind="guard" x="-569" y="-459">isOpen[0]</label>
 			<label kind="synchronisation" x="-569" y="-442">green8S[0] ?</label>
 			<label kind="assignment" x="-569" y="-425">et_time=0</label>
 		</transition>
-		<transition id="id23">
+		<transition id="id27">
 			<source ref="id1"/>
 			<target ref="id10"/>
 			<label kind="guard" x="-722" y="-433">!isOpen[0]</label>
 			<label kind="assignment" x="-722" y="-416">cont++</label>
 		</transition>
-		<transition id="id24">
+		<transition id="id28">
 			<source ref="id9"/>
 			<target ref="id4"/>
-			<label kind="guard" x="-671" y="-110">et_time &lt;= t4</label>
+			<label kind="guard" x="-671" y="-110">et_time &gt;= t4</label>
 			<nail x="-620" y="-85"/>
 		</transition>
-		<transition id="id25">
+		<transition id="id29">
 			<source ref="id8"/>
 			<target ref="id3"/>
-			<label kind="guard" x="-306" y="-161">et_time &lt;= t3</label>
+			<label kind="guard" x="-306" y="-161">et_time &gt;= t3</label>
 		</transition>
-		<transition id="id26">
+		<transition id="id30">
 			<source ref="id7"/>
 			<target ref="id2"/>
-			<label kind="guard" x="-468" y="-374">et_time &lt;= t2</label>
+			<label kind="guard" x="-468" y="-374">et_time &gt;= t2</label>
 		</transition>
-		<transition id="id27">
+		<transition id="id31">
 			<source ref="id0"/>
 			<target ref="id6"/>
 			<label kind="assignment" x="-1011" y="-340">et_time = 0</label>
 		</transition>
-		<transition id="id28">
+		<transition id="id32">
 			<source ref="id4"/>
 			<target ref="id5"/>
 			<label kind="guard" x="-858" y="-127">isOpen[3]</label>
 			<label kind="assignment" x="-858" y="-110">et_time = 0</label>
 		</transition>
-		<transition id="id29">
+		<transition id="id33">
 			<source ref="id3"/>
 			<target ref="id9"/>
 			<label kind="guard" x="-450" y="-144">isOpen[2]</label>
 			<label kind="assignment" x="-450" y="-127">et_time = 0</label>
 		</transition>
-		<transition id="id30">
+		<transition id="id34">
 			<source ref="id2"/>
 			<target ref="id8"/>
 			<label kind="guard" x="-433" y="-314">isOpen[1]</label>
 			<label kind="assignment" x="-433" y="-297">et_time = 0</label>
 		</transition>
-		<transition id="id31">
+		<transition id="id35">
 			<source ref="id1"/>
 			<target ref="id7"/>
 			<label kind="guard" x="-663" y="-331">isOpen[0]</label>
 			<label kind="assignment" x="-663" y="-314">et_time = 0</label>
 		</transition>
-		<transition id="id32">
+		<transition id="id36">
 			<source ref="id6"/>
 			<target ref="id1"/>
-			<label kind="guard" x="-850" y="-365">et_time &lt;=t1</label>
-			<label kind="comments" x="-1054" y="-425">dX_Y : carro entre o ponto X e Y</label>
+			<label kind="guard" x="-850" y="-365">et_time &gt;=t1</label>
+			<label kind="comments" x="-1156" y="-425">dX_Y : Carro se descolando de X para Y</label>
 		</transition>
 	</template>
 	<template>
 		<name>semaforo</name>
-		<parameter>const int id, const int idAnt, const delay_t d</parameter>
+		<parameter>const int id, const int t0, const delay_t d</parameter>
 		<declaration>clock t;
 bool started;
 
@@ -205,142 +231,63 @@ void close(const int id) {
     t = 0;
     return;
 }</declaration>
-		<location id="id33" x="-289" y="-17">
+		<location id="id37" x="-289" y="-17">
 			<name x="-298" y="0">RED</name>
 		</location>
-		<location id="id34" x="-289" y="-170">
-			<name x="-280" y="-212">GREEN</name>
+		<location id="id38" x="-119" y="-161">
+			<name x="-110" y="-203">GREEN</name>
 		</location>
-		<location id="id35" x="42" y="-170">
-			<name x="8" y="-204">GREEN_8S</name>
-		</location>
-		<location id="id36" x="43" y="-17">
+		<location id="id39" x="43" y="-17">
 			<name x="16" y="-1">YELLOW</name>
 		</location>
-		<init ref="id33"/>
-		<transition id="id37">
-			<source ref="id36"/>
-			<target ref="id33"/>
-			<label kind="guard" x="-187" y="-42">t &gt;= d.yellow</label>
-			<label kind="assignment" x="-187" y="-8">t = 0</label>
-		</transition>
-		<transition id="id38">
-			<source ref="id35"/>
-			<target ref="id36"/>
-			<label kind="guard" x="67" y="-145">t &gt;= d.green</label>
-			<label kind="assignment" x="67" y="-128">close(id)</label>
-		</transition>
-		<transition id="id39">
-			<source ref="id34"/>
-			<target ref="id35"/>
-			<label kind="guard" x="-195" y="-204">t &gt;= d.t8s</label>
-			<label kind="synchronisation" x="-195" y="-161">green8S[id]!</label>
-			<label kind="assignment" x="-195" y="-136">t = 0</label>
-			<nail x="-204" y="-170"/>
-		</transition>
-		<transition id="id40">
-			<source ref="id33"/>
-			<target ref="id34"/>
-			<label kind="guard" x="-434" y="-161">t &gt;= d.red</label>
-			<label kind="synchronisation" x="-433" y="-127">green8S[idAnt] ?</label>
-			<label kind="assignment" x="-434" y="-144">open(id)</label>
-		</transition>
-	</template>
-	<template>
-		<name>Carro</name>
-		<declaration>bool finished;
-double x_step;
-const int v = 40;
-clock dt;
-
-void start() {
-    x_step = 0;
-    dt = 0;
-}
-
-void updateDist() {
-    // ? tipo double não é suportado na simulação simbolica
-    if(dt &gt; 0){
-        x_step = 11 * dt;
-    }
-}</declaration>
-		<location id="id41" x="-418" y="-77">
-			<name x="-444" y="-111">Begin</name>
-		</location>
-		<location id="id42" x="-206" y="-77">
-			<name x="-231" y="-145">Driving</name>
-		</location>
-		<location id="id43" x="134" y="-77">
-			<name x="109" y="-111">StopWait</name>
-		</location>
-		<location id="id44" x="-206" y="101">
-			<name x="-248" y="118">FinishTravel</name>
+		<location id="id40" x="-425" y="-17">
 			<committed/>
 		</location>
-		<location id="id45" x="6" y="7" color="#ff0000">
-			<name x="-28" y="-27">KyllerAngry</name>
-		</location>
-		<location id="id46" x="-204" y="8">
-			<name x="-189" y="-26">Goal</name>
-		</location>
-		<init ref="id41"/>
-		<transition id="id47">
-			<source ref="id46"/>
-			<target ref="id44"/>
-			<label kind="guard" x="-189" y="75">cont &lt;= 1</label>
+		<init ref="id40"/>
+		<transition id="id41">
+			<source ref="id40"/>
+			<target ref="id37"/>
+			<label kind="assignment" x="-407" y="-17">t:=t0</label>
 		</transition>
-		<transition id="id48">
-			<source ref="id46"/>
-			<target ref="id45"/>
-			<label kind="guard" x="-121" y="-18">cont &gt; 1</label>
+		<transition id="id42">
+			<source ref="id38"/>
+			<target ref="id39"/>
+			<label kind="guard" x="-25" y="-119">t&gt;=(d.yellow)</label>
+			<label kind="synchronisation" x="-8" y="-136">tick?</label>
 		</transition>
-		<transition id="id49">
-			<source ref="id42"/>
-			<target ref="id46"/>
-			<label kind="guard" x="-291" y="-43">finished</label>
+		<transition id="id43">
+			<source ref="id39"/>
+			<target ref="id37"/>
+			<label kind="guard" x="-153" y="-8">t&gt;=(d.red)</label>
+			<label kind="synchronisation" x="-136" y="8">tick?</label>
+			<label kind="assignment" x="-153" y="25">t:=0,
+close(id)</label>
 		</transition>
-		<transition id="id50">
-			<source ref="id42"/>
-			<target ref="id42"/>
-			<label kind="assignment" x="-248" y="-162">updateDist()</label>
-			<nail x="-231" y="-94"/>
-			<nail x="-231" y="-120"/>
-			<nail x="-206" y="-120"/>
-			<nail x="-206" y="-111"/>
-		</transition>
-		<transition id="id51">
-			<source ref="id43"/>
-			<target ref="id42"/>
-			<label kind="comments" x="-121" y="-69">Aguarda o sinal abrir</label>
-		</transition>
-		<transition id="id52">
-			<source ref="id42"/>
-			<target ref="id43"/>
-			<label kind="guard" x="-79" y="-162">!finished</label>
-			<label kind="assignment" x="-62" y="-137">cont++</label>
-			<label kind="comments" x="-121" y="-188">sinal fechado, pare!</label>
-			<nail x="-36" y="-145"/>
-		</transition>
-		<transition id="id53">
-			<source ref="id41"/>
-			<target ref="id42"/>
-			<label kind="assignment" x="-325" y="-77">start()</label>
+		<transition id="id44">
+			<source ref="id37"/>
+			<target ref="id38"/>
+			<label kind="guard" x="-306" y="-127">t&gt;= (d.green)</label>
+			<label kind="synchronisation" x="-272" y="-144">tick?</label>
+			<label kind="assignment" x="-280" y="-110">open(id)</label>
 		</transition>
 	</template>
 	<template>
 		<name>StartSys</name>
 		<declaration>clock t;</declaration>
-		<location id="id54" x="-1113" y="-374">
-			<name x="-1138" y="-408">SysOFF</name>
+		<location id="id45" x="-1946" y="-1436">
+			<name x="-1963" y="-1478">loop</name>
 		</location>
-		<location id="id55" x="-816" y="-374">
-			<name x="-841" y="-416">Started</name>
-		</location>
-		<init ref="id54"/>
-		<transition id="id56">
-			<source ref="id54"/>
-			<target ref="id55"/>
-			<label kind="synchronisation" x="-1011" y="-399">green8S[N-1]!</label>
+		<init ref="id45"/>
+		<transition id="id46">
+			<source ref="id45"/>
+			<target ref="id45"/>
+			<label kind="guard" x="-1886" y="-1530">t &gt; 1 and t &lt; 12</label>
+			<label kind="synchronisation" x="-1886" y="-1513">tick!</label>
+			<label kind="assignment" x="-1886" y="-1496">t:=0</label>
+			<nail x="-1904" y="-1496"/>
+			<nail x="-1836" y="-1496"/>
+			<nail x="-1836" y="-1394"/>
+			<nail x="-1904" y="-1394"/>
 		</transition>
 	</template>
 	<template>
@@ -348,41 +295,41 @@ void updateDist() {
 		<parameter>const id_t id, const delay_t delay, const int t0</parameter>
 		<declaration>// Place local declarations here.
 clock t = 0;</declaration>
-		<location id="id57" x="-501" y="-178">
+		<location id="id47" x="-501" y="-178">
 			<name x="-527" y="-212">Startup</name>
 		</location>
-		<location id="id58" x="-102" y="-280">
+		<location id="id48" x="-102" y="-280">
 			<name x="-119" y="-314">GREEN</name>
 		</location>
-		<location id="id59" x="-102" y="-178">
+		<location id="id49" x="-102" y="-178">
 			<name x="-128" y="-161">YELLOW</name>
 		</location>
-		<location id="id60" x="-340" y="-178">
+		<location id="id50" x="-340" y="-178">
 			<name x="-348" y="-161">RED</name>
 		</location>
-		<init ref="id57"/>
-		<transition id="id61">
-			<source ref="id57"/>
-			<target ref="id60"/>
+		<init ref="id47"/>
+		<transition id="id51">
+			<source ref="id47"/>
+			<target ref="id50"/>
 			<label kind="guard" x="-442" y="-178">t &gt; t0</label>
 			<label kind="synchronisation" x="-459" y="-203">start[id]?</label>
 			<label kind="assignment" x="-442" y="-161">t = 0</label>
 		</transition>
-		<transition id="id62">
-			<source ref="id59"/>
-			<target ref="id60"/>
+		<transition id="id52">
+			<source ref="id49"/>
+			<target ref="id50"/>
 			<label kind="guard" x="-297" y="-169">t &gt;= delay.yellow</label>
 			<label kind="assignment" x="-297" y="-152">t = 0</label>
 		</transition>
-		<transition id="id63">
-			<source ref="id58"/>
-			<target ref="id59"/>
+		<transition id="id53">
+			<source ref="id48"/>
+			<target ref="id49"/>
 			<label kind="guard" x="-93" y="-254">t &gt;=delay.green</label>
 			<label kind="assignment" x="-93" y="-237">t = 0</label>
 		</transition>
-		<transition id="id64">
-			<source ref="id60"/>
-			<target ref="id58"/>
+		<transition id="id54">
+			<source ref="id50"/>
+			<target ref="id48"/>
 			<label kind="guard" x="-306" y="-322">t &gt;= delay.red</label>
 			<label kind="assignment" x="-306" y="-305">t = 0</label>
 			<nail x="-340" y="-280"/>
@@ -390,76 +337,137 @@ clock t = 0;</declaration>
 	</template>
 	<system>// Place template instantiations here.
 
-const int td = 8;
-const delay_t delay = {10, 20 - td, 2, td};
+const int td1 = 0;
+const int td2 = 8;
+const int td3 = 16;
+const int td4 = 24;
+const delay_t delay = {20, 22, 32};
 
-s1 = semaforo(0, 3, delay);
-s2 = semaforo(1, 0, delay);
-s3 = semaforo(2, 1, delay);
-s4 = semaforo(3, 2, delay);
+s1 = semaforo(0, td1, delay);
+s2 = semaforo(1, td2, delay);
+s3 = semaforo(2, td3, delay);
+s4 = semaforo(3, td4, delay);
 
 // tempo do trajeto (em segundos)
 
-const int t1 = 108;
-const int t2 = 14;
-const int t3 = 10;
-const int t4 = 10;
-const int t5 = 10;
+const int t1 = 109;
+const int t2 = 12;
+const int t3 = 14;
+const int t4 = 16;
+const int t5 = 8;
 
-carro = Carro();
 t = Trajeto(t1, t2, t3, t4, t5);
 
 // List one or more processes to be composed into a system.
 system s1, s2, s3, s4, t, StartSys;
+//system s1, s2, s3, s4, t, StartSys;
+
 </system>
 	<queries>
+		<option key="--exploration" value="0"/>
 		<query>
-			<formula>E&lt;&gt; (!s1.YELLOW) and (!s2.YELLOW) and (!s3.YELLOW) and (!s4.YELLOW)</formula>
+			<formula>A[] (!s1.YELLOW) and (!s2.YELLOW) and (!s3.YELLOW) and (!s4.YELLOW)</formula>
 			<comment>não pode ter todos os semáforos em amarelo</comment>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:12:57 -0300">
+			<result outcome="failure" type="quality" timestamp="2024-05-14 09:02:47 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
 		</query>
 		<query>
-			<formula>E&lt;&gt; (s1.GREEN_8S or s1.GREEN) and (s2.GREEN_8S or s2.GREEN) and (s3.GREEN_8S or s3.GREEN) and (s4.GREEN_8S or s4.GREEN)</formula>
+			<formula>E&lt;&gt; (s1.GREEN) and (s2.GREEN) and (s3.GREEN) and (s4.GREEN)</formula>
 			<comment/>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:12:58 -0300">
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:50:58 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
+		</query>
+		<query>
+			<formula>==== Verificação básica de reachability</formula>
+			<comment/>
 		</query>
 		<query>
 			<formula>E&lt;&gt; t.T1</formula>
-			<comment/>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:12:59 -0300">
+			<comment>Verifica se T1 eventualmente ocorre</comment>
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:08 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
 		</query>
 		<query>
 			<formula>E&lt;&gt; t.T2</formula>
 			<comment/>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:13:00 -0300">
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:10 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
 		</query>
 		<query>
 			<formula>E&lt;&gt; t.T3</formula>
 			<comment/>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:13:01 -0300">
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:12 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
 		</query>
 		<query>
 			<formula>E&lt;&gt; t.T4</formula>
 			<comment/>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:13:02 -0300">
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:14 -0300">
+				<option key="--exploration" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>E&lt;&gt; t.Casa</formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:20 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
 		</query>
 		<query>
 			<formula>E&lt;&gt; t.Casa and cont == 0</formula>
-			<comment>Consegue atingir o objetivo sem fazer nenhuma parada?</comment>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:18:08 -0300">
+			<comment>Existe algum caminho em o local Casa é atingindo cujo contador de parados é nulo?</comment>
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:31 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
 		</query>
 		<query>
 			<formula>E&lt;&gt; (t.Casa) and !(cont &gt; 1)</formula>
-			<comment>Pode chegar em casa sem parar mais que uma vez no semaforo?</comment>
-			<result outcome="success" type="quality" timestamp="2024-04-27 14:17:18 -0300">
+			<comment>Existe algum caminho em o local Casa é atingindo cujo contador de parados não é maior que 1?</comment>
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:51:46 -0300">
+				<option key="--exploration" value="0"/>
 			</result>
+		</query>
+		<query>
+			<formula>E&lt;&gt; t.AngryKyller</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>A[] t.Casa imply cont &lt;= 1</formula>
+			<comment>Para todos os estados no local Casa, implica que cont é menor ou igual a 1</comment>
+		</query>
+		<query>
+			<formula>==== Verifica travamentos</formula>
+			<comment/>
+		</query>
+		<query>
+			<formula>E[] not s1.GREEN</formula>
+			<comment>Existem algum caminho que s1 está sempre verde</comment>
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:53:54 -0300">
+				<option key="--exploration" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>E[] not s1.YELLOW</formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2024-05-13 16:31:09 -0300">
+				<option key="--exploration" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>E[] not t.T1</formula>
+			<comment>Existe algum caminho, em que todos os estados são t.P1</comment>
+			<result outcome="success" type="quality" timestamp="2024-05-14 02:54:08 -0300">
+				<option key="--exploration" value="0"/>
+			</result>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment>Verifica se o sistema têm deadlock</comment>
 		</query>
 	</queries>
 </nta>

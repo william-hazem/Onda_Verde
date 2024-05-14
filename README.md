@@ -41,7 +41,7 @@ Com esse esquema pode-se traçar uma rotina de sinalização das vias consideran
 
 Para exemplificar o problema, vamos considerar que um usuário qualquer denominado senhor K, deseja desloca-se do ponto inicial (Posto) até o seu destino final (Rota) trafegando a uma velocidade média ($V_{med}$). O senhor K deseja concluir o trajeto no menor tempo possível que o permita parar no máximo uma única vez em uma das sinalizações controladas dispostas ao longo das vias que contempla o percurso.
 
-Senhor K pode iniciar seu trajeto a qualquer momento, independente do estado atual do sistema. Se ele partir a tem um instante $t_0$ ele chegará ao semáforo em um instante $t_1=120$ segundos. Durante o trajeto do ponto inicial até o 1º semáforo, terão ocorridos cerca de 3,6 ($\frac{t_1 - t_0}{T_{ciclo}}$) ciclos do sistema. Então o senhor K estará diante de qualquer estado que é passível de ocorrer durante os 40 % restantes do ciclo em que chegou. Alguns casos podem ser analisados:
+Senhor K pode iniciar seu trajeto a qualquer momento, independente do estado atual do sistema. Se ele partir a tem um instante $t_0$ ele chegará ao semáforo em um instante $t_1-t_0=109$ segundos. Durante o trajeto do ponto inicial até o 1º semáforo, terão ocorridos cerca de 3,4 ($\frac{t_1 - t_0}{T_{ciclo}}$) ciclos do sistema. Então o senhor K estará diante de qualquer estado que é passível de ocorrer durante os 60 % restantes do ciclo em que chegou. Alguns casos podem ser analisados:
 - Se ele partiu no exato momento em que o próximo sinal abriu, ele chegará no semáforo à 60% do ciclo, ou seja, o contador de S1 estará indicando 18 segundos. E conseguirá passar no sinal verde nos segundos restante.
 - Se ele partir a qualquer momento após a abertura de S1, em que:
     - $t_0 \in [0, 2)$ sinal verde
@@ -89,11 +89,11 @@ São definidos como uma tupla (L, v), onde L é um vetor de localização e v é
 - <> - Algum estado em um caminho
 
 Algumas combinações também são suportadas, como:
-A[] <expressão>
-E<> <expressão>
-E[] <expressão>
-A<> <expressão>
-<expressão> --> <expressão>
+- E<> p : Existem algum caminho em que p eventualmente ocorre. 
+- A[] p : Para todos os caminhos p ocorre
+- E[] p: Existe algum caminho que p sempre ocorre
+- A<> p: Para todos os caminhos p eventualmente ocorre
+- q --> p: Sempre que p se mantém q acaba por se manter
 
 **Verificação de Alcançabilidade**:
 Verifica se algum estado é alcançável a partir do estado inicial.
